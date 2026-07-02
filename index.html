@@ -240,6 +240,8 @@
     min-height:220px;
   }
   .testi-card p.quote{font-size:1.02rem; color:var(--bone); margin-bottom:24px;}
+  .testi-card p.quote strong, .testi-slide p.quote strong{color:var(--ember); font-weight:600;}
+  .testi-card .who strong, .testi-slide .who strong{color:var(--ember);}
   .testi-badge{
     font-family:'IBM Plex Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase;
     color:var(--ember); margin-bottom:12px;
@@ -537,6 +539,13 @@
 
     async function cargarTestimonios(){
       if(TESTIMONIOS_API.startsWith("PEGA_AQUI")) return; // aún no configurado
+
+      // Escapa HTML por seguridad y convierte **frase** en <strong>frase</strong>
+      function formatearTexto(texto){
+        const escapado = texto.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return escapado.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      }
+
       try{
         const res = await fetch(TESTIMONIOS_API);
         const testimonios = await res.json();
@@ -564,8 +573,8 @@
                 ${t.fotoAntes ? `<div class="testi-photo"><img src="${t.fotoAntes}" alt="Antes"><span>Antes</span></div>` : ''}
                 ${t.fotoDespues ? `<div class="testi-photo"><img src="${t.fotoDespues}" alt="Después"><span>Después</span></div>` : ''}
               </div>
-              <p class="quote">"${t.texto}"</p>
-              <div class="who">${t.nombre}</div>`;
+              <p class="quote">"${formatearTexto(t.texto)}"</p>
+              <div class="who">${formatearTexto(t.nombre)}</div>`;
             carousel.appendChild(slide);
           });
         }
@@ -579,7 +588,7 @@
             const card = document.createElement('div');
             card.className = 'testi-card reveal in';
             const badge = t.destacado ? `<div class="testi-badge">★ Destacado</div>` : '';
-            card.innerHTML = `${badge}<p class="quote">"${t.texto}"</p><div class="who">${t.nombre}</div>`;
+            card.innerHTML = `${badge}<p class="quote">"${formatearTexto(t.texto)}"</p><div class="who">${formatearTexto(t.nombre)}</div>`;
             grid.appendChild(card);
           });
         } else if(conFotos.length){
