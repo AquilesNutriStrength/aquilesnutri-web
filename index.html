@@ -293,7 +293,14 @@
   @media(max-width:600px){ .testi-slide{flex-basis:240px;} }
   .testi-slide-text{flex-basis:340px;}
   @media(max-width:600px){ .testi-slide-text{flex-basis:280px;} }
-  .testi-stars{color:var(--ember); letter-spacing:2px; font-size:0.95rem; margin-bottom:12px;}
+  .testi-header{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+  .testi-stars{color:var(--ember); letter-spacing:2px; font-size:0.95rem;}
+  .testi-highlight{
+    font-family:'Fraunces',serif; font-weight:600; font-size:0.95rem;
+    color:var(--ember); line-height:1.3;
+  }
+  .testi-highlight::before{content:"“ "; }
+  .testi-highlight::after{content:" ”"; }
   .testi-card .who{
     font-family:'IBM Plex Mono',monospace;
     font-size:0.72rem;
@@ -579,10 +586,26 @@
       function estrellasHTML(puntuacion){
         const n = parseInt(puntuacion, 10);
         if(!n || n < 1) return '';
-        let out = '<div class="testi-stars">';
+        let out = '<span class="testi-stars">';
         for(let i=1; i<=5; i++){ out += i <= n ? '★' : '☆'; }
-        out += '</div>';
+        out += '</span>';
         return out;
+      }
+
+      // Extrae la primera frase en **negrita** del texto para destacarla arriba
+      function fraseClaveHTML(texto){
+        const match = texto.match(/\*\*(.+?)\*\*/);
+        if(!match) return '';
+        const escapado = match[1].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return `<span class="testi-highlight">${escapado}</span>`;
+      }
+
+      // Fila conjunta: estrellas + frase clave en negrita, en la misma línea
+      function cabeceraHTML(puntuacion, texto){
+        const estrellas = estrellasHTML(puntuacion);
+        const frase = fraseClaveHTML(texto);
+        if(!estrellas && !frase) return '';
+        return `<div class="testi-header">${estrellas}${frase}</div>`;
       }
 
       // Genera el HTML de la cita: truncada + botón "Leer más" si el texto es largo
@@ -629,7 +652,7 @@
                 ${t.fotoAntes ? `<div class="testi-photo"><img src="${t.fotoAntes}" alt="Antes"><span>Antes</span></div>` : ''}
                 ${t.fotoDespues ? `<div class="testi-photo"><img src="${t.fotoDespues}" alt="Después"><span>Después</span></div>` : ''}
               </div>
-              ${estrellasHTML(t.puntuacion)}
+              ${cabeceraHTML(t.puntuacion, t.texto)}
               ${quoteHTML(t.texto)}
               <div class="who">${formatearTexto(t.nombre)}</div>`;
             carousel.appendChild(slide);
@@ -645,7 +668,7 @@
             const slide = document.createElement('div');
             slide.className = 'testi-slide testi-slide-text';
             const badge = t.destacado ? `<div class="testi-badge">★ Destacado</div>` : '';
-            slide.innerHTML = `${badge}${estrellasHTML(t.puntuacion)}${quoteHTML(t.texto)}<div class="who">${formatearTexto(t.nombre)}</div>`;
+            slide.innerHTML = `${badge}${cabeceraHTML(t.puntuacion, t.texto)}${quoteHTML(t.texto)}<div class="who">${formatearTexto(t.nombre)}</div>`;
             textCarousel.appendChild(slide);
           });
         }
