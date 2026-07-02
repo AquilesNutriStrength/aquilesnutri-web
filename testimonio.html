@@ -68,9 +68,23 @@
         <label for="nombre">Tu nombre</label>
         <input type="text" id="nombre" name="nombre" required>
       </div>
+      <div class="field" style="display:flex; gap:14px;">
+        <div style="flex:1;">
+          <label for="edad">Edad <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
+          <input type="text" id="edad" name="edad" inputmode="numeric" placeholder="Ej: 34">
+        </div>
+        <div style="flex:2;">
+          <label for="profesion">A qué te dedicas <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
+          <input type="text" id="profesion" name="profesion" placeholder="Ej: comercial, opositor, madre de 2...">
+        </div>
+      </div>
       <div class="field">
-        <label for="testimonio">¿Qué cambió para ti trabajando conmigo?</label>
-        <textarea id="testimonio" name="testimonio" required placeholder="Cuánto tiempo llevas, qué te costaba antes, qué es distinto ahora..."></textarea>
+        <label for="situacion">¿Cuál era tu situación antes de empezar?</label>
+        <input type="text" id="situacion" name="situacion" required placeholder="Ej: entrenaba 4 días pero no bajaba de grasa / quería subir rendimiento en rugby...">
+      </div>
+      <div class="field">
+        <label for="testimonio">¿Qué cambió trabajando conmigo?</label>
+        <textarea id="testimonio" name="testimonio" required placeholder="Si tienes un número o resultado concreto (kg, %, marca, tiempo), inclúyelo — pesa más que una frase general."></textarea>
       </div>
       <div class="field check">
         <input type="checkbox" id="autorizo" name="autorizo" required>
@@ -107,6 +121,9 @@
           headers: {'Content-Type': 'text/plain;charset=utf-8'},
           body: JSON.stringify({
             nombre: document.getElementById('nombre').value,
+            edad: document.getElementById('edad').value,
+            profesion: document.getElementById('profesion').value,
+            situacion: document.getElementById('situacion').value,
             testimonio: document.getElementById('testimonio').value,
             autorizo: document.getElementById('autorizo').checked
           })
