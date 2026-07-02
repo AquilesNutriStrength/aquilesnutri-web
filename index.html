@@ -625,13 +625,10 @@
         const testimonios = await res.json();
         if(!testimonios.length) return;
 
-        const conFotos = testimonios.filter(t => t.fotoAntes || t.fotoDespues);
-        const soloTextoTodos = testimonios.filter(t => !t.fotoAntes && !t.fotoDespues);
-
-        // Los destacados van primero, luego el resto por orden de llegada (más recientes primero)
-        const destacados = soloTextoTodos.filter(t => t.destacado);
-        const resto = soloTextoTodos.filter(t => !t.destacado);
-        const soloTexto = destacados.concat(resto);
+        // Solo se muestran los testimonios marcados como Destacado en el Sheet
+        const testimoniosDestacados = testimonios.filter(t => t.destacado);
+        const conFotos = testimoniosDestacados.filter(t => t.fotoAntes || t.fotoDespues);
+        const soloTexto = testimoniosDestacados.filter(t => !t.fotoAntes && !t.fotoDespues);
 
         if(!conFotos.length && !soloTexto.length) return;
 
@@ -667,8 +664,7 @@
           soloTexto.forEach(t => {
             const slide = document.createElement('div');
             slide.className = 'testi-slide testi-slide-text';
-            const badge = t.destacado ? `<div class="testi-badge">★ Destacado</div>` : '';
-            slide.innerHTML = `${badge}${cabeceraHTML(t.puntuacion, t.texto)}${quoteHTML(t.texto)}<div class="who">${formatearTexto(t.nombre)}</div>`;
+            slide.innerHTML = `${cabeceraHTML(t.puntuacion, t.texto)}${quoteHTML(t.texto)}<div class="who">${formatearTexto(t.nombre)}</div>`;
             textCarousel.appendChild(slide);
           });
         }
