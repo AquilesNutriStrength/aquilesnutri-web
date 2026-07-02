@@ -32,6 +32,16 @@
     color:var(--bone); padding:13px 14px; font-family:'Inter',sans-serif; font-size:0.98rem;
     border-radius:2px;
   }
+  input[type="file"]{
+    width:100%; background:var(--card); border:1px solid var(--card-border);
+    color:var(--ash); padding:10px; font-family:'Inter',sans-serif; font-size:0.85rem;
+    border-radius:2px;
+  }
+  input[type="file"]::file-selector-button{
+    background:var(--ember); color:var(--void); border:none; padding:6px 12px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase;
+    margin-right:10px; cursor:pointer; border-radius:2px;
+  }
   input:focus, textarea:focus{outline:2px solid var(--ember); outline-offset:1px;}
   textarea{min-height:120px; resize:vertical;}
   .check{display:flex; align-items:flex-start; gap:10px; font-size:0.9rem; color:var(--ash);}
@@ -86,9 +96,21 @@
         <label for="testimonio">¿Qué cambió trabajando conmigo?</label>
         <textarea id="testimonio" name="testimonio" required placeholder="Si tienes un número o resultado concreto (kg, %, marca, tiempo), inclúyelo — pesa más que una frase general."></textarea>
       </div>
+      <div class="field" style="display:flex; gap:14px;">
+        <div style="flex:1;">
+          <label for="fotoAntes">Foto de antes <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
+          <input type="file" id="fotoAntes" name="fotoAntes" accept="image/*">
+          <img id="previewAntes" style="display:none; width:100%; margin-top:8px; border:1px solid var(--card-border); border-radius:2px;">
+        </div>
+        <div style="flex:1;">
+          <label for="fotoDespues">Foto de después <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
+          <input type="file" id="fotoDespues" name="fotoDespues" accept="image/*">
+          <img id="previewDespues" style="display:none; width:100%; margin-top:8px; border:1px solid var(--card-border); border-radius:2px;">
+        </div>
+      </div>
       <div class="field check">
         <input type="checkbox" id="autorizo" name="autorizo" required>
-        <label style="text-transform:none; font-family:'Inter',sans-serif; color:var(--ash); letter-spacing:normal; margin:0;" for="autorizo">Autorizo a Aquiles a publicar este testimonio (con mi nombre) en la web y redes.</label>
+        <label style="text-transform:none; font-family:'Inter',sans-serif; color:var(--ash); letter-spacing:normal; margin:0;" for="autorizo">Autorizo a Aquiles a publicar este testimonio (y las fotos, si las adjunto) con mi nombre en la web y redes.</label>
       </div>
       <button type="submit" id="submitBtn">Enviar testimonio</button>
       <div class="msg" id="msgBox"></div>
@@ -105,6 +127,48 @@
     const btn = document.getElementById('submitBtn');
     const msg = document.getElementById('msgBox');
 
+    // Comprime y redimensiona una imagen en el navegador antes de enviarla (máx 1000px, calidad 0.75)
+    function comprimirImagen(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) { resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxW = 1000;
+            const scale = Math.min(1, maxW / img.width);
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.75));
+          };
+          img.onerror = reject;
+          img.src = evt.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Vista previa al elegir archivo
+    function setupPreview(inputId, previewId) {
+      document.getElementById(inputId).addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        const preview = document.getElementById(previewId);
+        if (!file) { preview.style.display = 'none'; return; }
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          preview.src = evt.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    setupPreview('fotoAntes', 'previewAntes');
+    setupPreview('fotoDespues', 'previewDespues');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if(TESTIMONIOS_API.startsWith("PEGA_AQUI")){
@@ -115,6 +179,13 @@
       btn.disabled = true;
       btn.textContent = 'Enviando...';
       try{
+        const fotoAntesFile = document.getElementById('fotoAntes').files[0];
+        const fotoDespuesFile = document.getElementById('fotoDespues').files[0];
+        const [fotoAntesB64, fotoDespuesB64] = await Promise.all([
+          comprimirImagen(fotoAntesFile),
+          comprimirImagen(fotoDespuesFile)
+        ]);
+
         await fetch(TESTIMONIOS_API, {
           method: 'POST',
           mode: 'no-cors',
@@ -125,12 +196,16 @@
             profesion: document.getElementById('profesion').value,
             situacion: document.getElementById('situacion').value,
             testimonio: document.getElementById('testimonio').value,
-            autorizo: document.getElementById('autorizo').checked
+            autorizo: document.getElementById('autorizo').checked,
+            fotoAntes: fotoAntesB64,
+            fotoDespues: fotoDespuesB64
           })
         });
         msg.className = 'msg ok';
         msg.textContent = '¡Gracias! Lo recibí — en cuanto lo revise, lo publico en la web.';
         form.reset();
+        document.getElementById('previewAntes').style.display = 'none';
+        document.getElementById('previewDespues').style.display = 'none';
       }catch(err){
         msg.className = 'msg err';
         msg.textContent = 'Algo falló al enviarlo. Prueba de nuevo o mándamelo por WhatsApp.';

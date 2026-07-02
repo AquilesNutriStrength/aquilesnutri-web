@@ -240,6 +240,44 @@
     min-height:220px;
   }
   .testi-card p.quote{font-size:1.02rem; color:var(--bone); margin-bottom:24px;}
+  .testi-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ember); margin-bottom:12px;
+  }
+  .testi-photos{display:flex; gap:8px; margin-bottom:18px;}
+  .testi-photo{flex:1; position:relative;}
+  .testi-photo img{width:100%; aspect-ratio:1/1; object-fit:cover; display:block; border:1px solid var(--card-border);}
+  .testi-photo span{
+    position:absolute; bottom:6px; left:6px;
+    background:rgba(13,13,13,0.75); color:var(--bone);
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase;
+    padding:3px 8px;
+  }
+
+  .testi-carousel{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding-bottom:14px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .testi-carousel::-webkit-scrollbar{height:6px;}
+  .testi-carousel::-webkit-scrollbar-thumb{background:var(--card-border);}
+  .testi-slide{
+    flex:0 0 280px;
+    scroll-snap-align:start;
+    background:var(--card);
+    border:1px solid var(--card-border);
+    padding:20px 20px 24px;
+  }
+  .testi-slide .testi-photos{margin-bottom:16px;}
+  .testi-slide p.quote{font-size:0.94rem; color:var(--bone); margin-bottom:14px;}
+  .testi-slide .who{
+    font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--ember);
+    letter-spacing:0.04em; text-transform:uppercase;
+  }
+  @media(max-width:600px){ .testi-slide{flex-basis:240px;} }
   .testi-card .who{
     font-family:'IBM Plex Mono',monospace;
     font-size:0.72rem;
@@ -477,18 +515,25 @@
       <div class="eyebrow">Resultados reales</div>
       <h2>Gente que ya dio el cambio</h2>
     </div>
+
+    <div id="testi-carousel-wrap" style="display:none; margin-bottom:56px;">
+      <div class="eyebrow sage" style="margin-bottom:18px;">Antes y después</div>
+      <div class="testi-carousel" id="testi-carousel"></div>
+    </div>
+
     <div class="grid-3" id="testi-grid">
       <div class="testi-card reveal" id="testi-empty-state" style="align-items:center; text-align:center; justify-content:center;">
         <p class="quote" style="color:var(--ash); font-style:italic;">Todavía no hay testimonios publicados — si ya trabajaste conmigo, sé el primero en dejar el tuyo.</p>
         <a href="testimonio.html" class="btn btn-ghost" style="align-self:center; margin-top:8px;">Dejar mi testimonio</a>
       </div>
-      <!-- Aquí se insertan automáticamente los testimonios aprobados desde el Google Form -->
+      <!-- Aquí se insertan automáticamente los testimonios de solo texto aprobados -->
     </div>
   </section>
 
   <script>
     // TODO: pega aquí la URL /exec de tu Apps Script Web App (la misma que en testimonio.html)
     const TESTIMONIOS_API = "https://script.google.com/macros/s/AKfycbzbWfehVl6Epos8-tMUT9YOM1gPXSKFmJKf6OUxlBzHb9PLbhIojbT9Xt-xGGaaUb8X/exec";
+    const MAX_TESTIMONIOS_TEXTO = 6; // límite de tarjetas de solo texto que se muestran
 
     async function cargarTestimonios(){
       if(TESTIMONIOS_API.startsWith("PEGA_AQUI")) return; // aún no configurado
@@ -496,15 +541,52 @@
         const res = await fetch(TESTIMONIOS_API);
         const testimonios = await res.json();
         if(!testimonios.length) return;
-        const grid = document.querySelector('#casos .grid-3');
-        const empty = document.getElementById('testi-empty-state');
-        if(empty) empty.remove();
-        testimonios.forEach(t => {
-          const card = document.createElement('div');
-          card.className = 'testi-card reveal in';
-          card.innerHTML = `<p class="quote">"${t.texto}"</p><div class="who">${t.nombre}</div>`;
-          grid.appendChild(card);
-        });
+
+        const conFotos = testimonios.filter(t => t.fotoAntes || t.fotoDespues);
+        const soloTextoTodos = testimonios.filter(t => !t.fotoAntes && !t.fotoDespues);
+
+        // Los destacados salen siempre; los huecos restantes (hasta el límite) se llenan con los más recientes
+        const destacados = soloTextoTodos.filter(t => t.destacado);
+        const resto = soloTextoTodos.filter(t => !t.destacado);
+        const huecosRestantes = Math.max(0, MAX_TESTIMONIOS_TEXTO - destacados.length);
+        const soloTexto = destacados.concat(resto.slice(0, huecosRestantes));
+
+        // Carrusel de antes/después
+        if(conFotos.length){
+          const carouselWrap = document.getElementById('testi-carousel-wrap');
+          const carousel = document.getElementById('testi-carousel');
+          carouselWrap.style.display = 'block';
+          conFotos.forEach(t => {
+            const slide = document.createElement('div');
+            slide.className = 'testi-slide';
+            slide.innerHTML = `
+              <div class="testi-photos">
+                ${t.fotoAntes ? `<div class="testi-photo"><img src="${t.fotoAntes}" alt="Antes"><span>Antes</span></div>` : ''}
+                ${t.fotoDespues ? `<div class="testi-photo"><img src="${t.fotoDespues}" alt="Después"><span>Después</span></div>` : ''}
+              </div>
+              <p class="quote">"${t.texto}"</p>
+              <div class="who">${t.nombre}</div>`;
+            carousel.appendChild(slide);
+          });
+        }
+
+        // Tarjetas de solo texto
+        if(soloTexto.length){
+          const grid = document.querySelector('#casos .grid-3');
+          const empty = document.getElementById('testi-empty-state');
+          if(empty) empty.remove();
+          soloTexto.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'testi-card reveal in';
+            const badge = t.destacado ? `<div class="testi-badge">★ Destacado</div>` : '';
+            card.innerHTML = `${badge}<p class="quote">"${t.texto}"</p><div class="who">${t.nombre}</div>`;
+            grid.appendChild(card);
+          });
+        } else if(conFotos.length){
+          // Si solo hay testimonios con foto, quitamos el estado vacío igualmente
+          const empty = document.getElementById('testi-empty-state');
+          if(empty) empty.remove();
+        }
       }catch(err){ console.error('No se pudieron cargar los testimonios', err); }
     }
     cargarTestimonios();
