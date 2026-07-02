@@ -43,6 +43,9 @@
     margin-right:10px; cursor:pointer; border-radius:2px;
   }
   input:focus, textarea:focus{outline:2px solid var(--ember); outline-offset:1px;}
+  .star-input{font-size:2rem; letter-spacing:6px; cursor:pointer; user-select:none;}
+  .star-input span{color:var(--card-border); transition:color 0.15s ease;}
+  .star-input span.filled{color:var(--ember);}
   textarea{min-height:120px; resize:vertical;}
   .check{display:flex; align-items:flex-start; gap:10px; font-size:0.9rem; color:var(--ash);}
   .check input{margin-top:3px;}
@@ -91,6 +94,13 @@
       <div class="field">
         <label for="situacion">¿Cuál era tu situación antes de empezar?</label>
         <input type="text" id="situacion" name="situacion" required placeholder="Ej: entrenaba 4 días pero no bajaba de grasa / quería subir rendimiento en rugby...">
+      </div>
+      <div class="field">
+        <label>¿Cómo puntúas tu experiencia?</label>
+        <div class="star-input" id="starInput">
+          <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+        </div>
+        <input type="hidden" id="puntuacion" name="puntuacion" value="5" required>
       </div>
       <div class="field">
         <label for="testimonio">¿Qué cambió trabajando conmigo?</label>
@@ -169,6 +179,20 @@
     setupPreview('fotoAntes', 'previewAntes');
     setupPreview('fotoDespues', 'previewDespues');
 
+    // Sistema de estrellas
+    const starSpans = document.querySelectorAll('#starInput span');
+    const puntuacionInput = document.getElementById('puntuacion');
+    function pintarEstrellas(valor){
+      starSpans.forEach(s => s.classList.toggle('filled', parseInt(s.dataset.val) <= valor));
+    }
+    pintarEstrellas(5); // valor por defecto
+    starSpans.forEach(s => {
+      s.addEventListener('click', () => {
+        puntuacionInput.value = s.dataset.val;
+        pintarEstrellas(parseInt(s.dataset.val));
+      });
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if(TESTIMONIOS_API.startsWith("PEGA_AQUI")){
@@ -196,6 +220,7 @@
             profesion: document.getElementById('profesion').value,
             situacion: document.getElementById('situacion').value,
             testimonio: document.getElementById('testimonio').value,
+            puntuacion: document.getElementById('puntuacion').value,
             autorizo: document.getElementById('autorizo').checked,
             fotoAntes: fotoAntesB64,
             fotoDespues: fotoDespuesB64
