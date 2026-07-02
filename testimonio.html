@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deja tu testimonio — Aquiles Nutri Strength</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#222420; --card:#33352E; --card-border:#454740;
+    --ash:#A9A79C; --bone:#F1EEE6; --ember:#F6A000; --sage:#8CAA5C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--void); color:var(--bone);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:32px;
+  }
+  .box{max-width:520px; width:100%;}
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:36px;}
+  .brand img{width:32px; height:32px; object-fit:contain;}
+  .brand span{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; color:var(--ash);}
+  h1{font-family:'Fraunces',serif; font-size:2rem; margin-bottom:12px; line-height:1.15;}
+  p.sub{color:var(--ash); margin-bottom:32px; font-size:0.98rem;}
+  label{display:block; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--sage); margin-bottom:8px;}
+  .field{margin-bottom:22px;}
+  input[type="text"], textarea{
+    width:100%; background:var(--card); border:1px solid var(--card-border);
+    color:var(--bone); padding:13px 14px; font-family:'Inter',sans-serif; font-size:0.98rem;
+    border-radius:2px;
+  }
+  input:focus, textarea:focus{outline:2px solid var(--ember); outline-offset:1px;}
+  textarea{min-height:120px; resize:vertical;}
+  .check{display:flex; align-items:flex-start; gap:10px; font-size:0.9rem; color:var(--ash);}
+  .check input{margin-top:3px;}
+  button{
+    margin-top:8px;
+    width:100%;
+    padding:15px;
+    background:var(--ember); color:var(--void);
+    border:none; font-family:'IBM Plex Mono',monospace; font-weight:600;
+    font-size:0.82rem; letter-spacing:0.06em; text-transform:uppercase;
+    cursor:pointer;
+  }
+  button:hover{background:#FF9B00;}
+  button:disabled{opacity:0.6; cursor:not-allowed;}
+  .msg{margin-top:20px; font-size:0.92rem; padding:14px; border-radius:2px; display:none;}
+  .msg.ok{background:rgba(140,170,92,0.15); border:1px solid var(--sage); color:var(--sage); display:block;}
+  .msg.err{background:rgba(198,91,78,0.15); border:1px solid #C65B4E; color:#C65B4E; display:block;}
+  a.back{display:inline-block; margin-top:28px; color:var(--ash); font-size:0.85rem; text-decoration:none;}
+  a.back:hover{color:var(--ember);}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="brand">
+      <img src="assets/logo-white.png" alt="Aquiles Nutri Strength">
+      <span>AQUILES NUTRI STRENGTH</span>
+    </div>
+    <h1>Cuéntame cómo te fue</h1>
+    <p class="sub">Dos minutos. Lo reviso y, si me das permiso, lo publico en la web para que otros vean resultados reales.</p>
+
+    <form id="testiForm">
+      <div class="field">
+        <label for="nombre">Tu nombre</label>
+        <input type="text" id="nombre" name="nombre" required>
+      </div>
+      <div class="field">
+        <label for="testimonio">¿Qué cambió para ti trabajando conmigo?</label>
+        <textarea id="testimonio" name="testimonio" required placeholder="Cuánto tiempo llevas, qué te costaba antes, qué es distinto ahora..."></textarea>
+      </div>
+      <div class="field check">
+        <input type="checkbox" id="autorizo" name="autorizo" required>
+        <label style="text-transform:none; font-family:'Inter',sans-serif; color:var(--ash); letter-spacing:normal; margin:0;" for="autorizo">Autorizo a Aquiles a publicar este testimonio (con mi nombre) en la web y redes.</label>
+      </div>
+      <button type="submit" id="submitBtn">Enviar testimonio</button>
+      <div class="msg" id="msgBox"></div>
+    </form>
+
+    <a class="back" href="index.html">← Volver a la web</a>
+  </div>
+
+  <script>
+    // TODO: pega aquí la misma URL /exec de tu Apps Script Web App
+    const TESTIMONIOS_API = "https://script.google.com/macros/s/AKfycbyvBc1wCbHrt7xK1fVOhFXmEKlx5_KhR_dIl-GYyrB5HvWirjbAwoijD_1Gx5R1mNQS/exec";
+
+    const form = document.getElementById('testiForm');
+    const btn = document.getElementById('submitBtn');
+    const msg = document.getElementById('msgBox');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(TESTIMONIOS_API.startsWith("PEGA_AQUI")){
+        msg.className = 'msg err';
+        msg.textContent = 'Esto aún no está conectado — Aquiles, pega la URL del Apps Script en el código.';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      try{
+        await fetch(TESTIMONIOS_API, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {'Content-Type': 'text/plain;charset=utf-8'},
+          body: JSON.stringify({
+            nombre: document.getElementById('nombre').value,
+            testimonio: document.getElementById('testimonio').value,
+            autorizo: document.getElementById('autorizo').checked
+          })
+        });
+        msg.className = 'msg ok';
+        msg.textContent = '¡Gracias! Lo recibí — en cuanto lo revise, lo publico en la web.';
+        form.reset();
+      }catch(err){
+        msg.className = 'msg err';
+        msg.textContent = 'Algo falló al enviarlo. Prueba de nuevo o mándamelo por WhatsApp.';
+      }finally{
+        btn.disabled = false;
+        btn.textContent = 'Enviar testimonio';
+      }
+    });
+  </script>
+</body>
+</html>

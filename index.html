@@ -480,18 +480,15 @@
     <div class="grid-3" id="testi-grid">
       <div class="testi-card reveal" id="testi-empty-state" style="align-items:center; text-align:center; justify-content:center;">
         <p class="quote" style="color:var(--ash); font-style:italic;">Todavía no hay testimonios publicados — si ya trabajaste conmigo, sé el primero en dejar el tuyo.</p>
-        <a href="#" id="testi-form-link" target="_blank" rel="noopener" class="btn btn-ghost" style="align-self:center; margin-top:8px;">Dejar mi testimonio</a>
+        <a href="testimonio.html" class="btn btn-ghost" style="align-self:center; margin-top:8px;">Dejar mi testimonio</a>
       </div>
       <!-- Aquí se insertan automáticamente los testimonios aprobados desde el Google Form -->
     </div>
   </section>
 
   <script>
-    // TODO: pega aquí la URL de tu Google Form (botón "Enviar" del formulario)
-    document.getElementById('testi-form-link').href = "PEGA_AQUI_TU_LINK_DE_GOOGLE_FORM";
-
-    // TODO: pega aquí la URL /exec de tu Apps Script Web App
-    const TESTIMONIOS_API = "PEGA_AQUI_TU_URL_DE_APPS_SCRIPT";
+    // TODO: pega aquí la URL /exec de tu Apps Script Web App (la misma que en testimonio.html)
+    const TESTIMONIOS_API = "https://script.google.com/macros/s/AKfycbyvBc1wCbHrt7xK1fVOhFXmEKlx5_KhR_dIl-GYyrB5HvWirjbAwoijD_1Gx5R1mNQS/exec";
 
     async function cargarTestimonios(){
       if(TESTIMONIOS_API.startsWith("PEGA_AQUI")) return; // aún no configurado
