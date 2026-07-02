@@ -129,6 +129,7 @@
     <a class="back" href="index.html">← Volver a la web</a>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script>
     // TODO: pega aquí la misma URL /exec de tu Apps Script Web App
     const TESTIMONIOS_API = "https://script.google.com/macros/s/AKfycbzbWfehVl6Epos8-tMUT9YOM1gPXSKFmJKf6OUxlBzHb9PLbhIojbT9Xt-xGGaaUb8X/exec";
@@ -137,10 +138,54 @@
     const btn = document.getElementById('submitBtn');
     const msg = document.getElementById('msgBox');
 
-    // Comprime y redimensiona una imagen en el navegador antes de enviarla (máx 1000px, calidad 0.75)
-    function comprimirImagen(file) {
+    // Convierte un archivo a base64 tal cual, sin comprimir (último recurso)
+    function archivoABase64Crudo(file) {
       return new Promise((resolve, reject) => {
-        if (!file) { resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = (evt) => resolve(evt.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Detecta si un archivo es HEIC/HEIF (formato nativo de fotos de iPhone)
+    function esHEIC(file) {
+      const tipo = (file.type || '').toLowerCase();
+      const nombre = (file.name || '').toLowerCase();
+      return tipo.includes('heic') || tipo.includes('heif') || nombre.endsWith('.heic') || nombre.endsWith('.heif');
+    }
+
+    // Si el archivo es HEIC, lo convierte a JPEG con heic2any (funciona en
+    // cualquier navegador, no depende de que el navegador sepa leer HEIC)
+    async function convertirSiEsHEIC(file) {
+      if (!esHEIC(file) || typeof heic2any !== 'function') return file;
+      const resultado = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+      return Array.isArray(resultado) ? resultado[0] : resultado;
+    }
+
+    // Comprime con createImageBitmap, pidiendo el resize directamente al decodificar
+    // (mucho más eficiente en memoria — clave para fotos de 48MP de iPhone)
+    async function comprimirConImageBitmap(file) {
+      const maxW = 1000;
+      let bitmap;
+      try {
+        bitmap = await createImageBitmap(file, { resizeWidth: maxW, resizeQuality: 'medium' });
+      } catch (err) {
+        bitmap = await createImageBitmap(file);
+      }
+      const scale = Math.min(1, maxW / bitmap.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close();
+      return canvas.toDataURL('image/jpeg', 0.75);
+    }
+
+    // Método clásico (compatibilidad con navegadores más antiguos)
+    function comprimirConImageElement(file) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (evt) => {
           const img = new Image();
@@ -148,8 +193,8 @@
             const maxW = 1000;
             const scale = Math.min(1, maxW / img.width);
             const canvas = document.createElement('canvas');
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             resolve(canvas.toDataURL('image/jpeg', 0.75));
@@ -160,6 +205,31 @@
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
+    }
+
+    // Intenta comprimir la imagen con varios métodos, de más a menos eficiente.
+    // Si todos fallan, manda el archivo tal cual sin comprimir (mejor una foto
+    // pesada que ninguna foto).
+    async function comprimirImagen(file) {
+      if (!file) return null;
+      const LIMITE_SIN_COMPRIMIR = 15 * 1024 * 1024; // 15MB
+
+      // Paso 1: si es HEIC (iPhone), convertir a JPEG primero
+      let archivo = file;
+      try { archivo = await convertirSiEsHEIC(file); }
+      catch (err) { /* si falla la conversión, seguimos con el archivo original */ }
+
+      if (typeof createImageBitmap === 'function') {
+        try { return await comprimirConImageBitmap(archivo); }
+        catch (err) { /* seguimos al siguiente método */ }
+      }
+      try { return await comprimirConImageElement(archivo); }
+      catch (err) { /* seguimos al siguiente método */ }
+
+      if (archivo.size <= LIMITE_SIN_COMPRIMIR) {
+        return await archivoABase64Crudo(archivo);
+      }
+      throw new Error('La foto no se pudo procesar y pesa demasiado para enviarla tal cual.');
     }
 
     // Vista previa al elegir archivo
@@ -202,12 +272,27 @@
       }
       btn.disabled = true;
       btn.textContent = 'Enviando...';
+
+      let avisoFoto = '';
+
+      // Comprime cada foto por separado; si una falla (ej: formato HEIC de iPhone
+      // que el navegador no puede leer), se ignora esa foto pero el envío sigue.
+      async function comprimirSeguro(file, etiqueta){
+        if(!file) return null;
+        try{
+          return await comprimirImagen(file);
+        }catch(err){
+          avisoFoto += ` La foto de "${etiqueta}" no se pudo procesar (prueba a hacerle una captura de pantalla y subir esa, o guárdala como JPG antes de subirla).`;
+          return null;
+        }
+      }
+
       try{
         const fotoAntesFile = document.getElementById('fotoAntes').files[0];
         const fotoDespuesFile = document.getElementById('fotoDespues').files[0];
         const [fotoAntesB64, fotoDespuesB64] = await Promise.all([
-          comprimirImagen(fotoAntesFile),
-          comprimirImagen(fotoDespuesFile)
+          comprimirSeguro(fotoAntesFile, 'antes'),
+          comprimirSeguro(fotoDespuesFile, 'después')
         ]);
 
         await fetch(TESTIMONIOS_API, {
@@ -227,7 +312,7 @@
           })
         });
         msg.className = 'msg ok';
-        msg.textContent = '¡Gracias! Lo recibí — en cuanto lo revise, lo publico en la web.';
+        msg.textContent = '¡Gracias! Lo recibí — en cuanto lo revise, lo publico en la web.' + avisoFoto;
         form.reset();
         document.getElementById('previewAntes').style.display = 'none';
         document.getElementById('previewDespues').style.display = 'none';
