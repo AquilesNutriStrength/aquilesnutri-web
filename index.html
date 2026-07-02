@@ -255,7 +255,7 @@
   .testi-card .who strong, .testi-slide .who strong{color:var(--ember);}
   .testi-photos{display:flex; gap:8px; margin-bottom:18px;}
   .testi-photo{flex:1; position:relative;}
-  .testi-photo img{width:100%; aspect-ratio:1/1; object-fit:cover; display:block; border:1px solid var(--card-border);}
+  .testi-photo img{width:100%; aspect-ratio:3/4; object-fit:cover; display:block; border:1px solid var(--card-border);}
   .testi-photo span{
     position:absolute; bottom:6px; left:6px;
     background:rgba(13,13,13,0.75); color:var(--bone);
@@ -274,7 +274,7 @@
   .testi-carousel::-webkit-scrollbar{height:6px;}
   .testi-carousel::-webkit-scrollbar-thumb{background:var(--card-border);}
   .testi-slide{
-    flex:0 0 280px;
+    flex:0 0 340px;
     scroll-snap-align:start;
     background:var(--card);
     border:1px solid var(--card-border);
@@ -286,7 +286,7 @@
     font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--ember);
     letter-spacing:0.04em; text-transform:uppercase;
   }
-  @media(max-width:600px){ .testi-slide{flex-basis:240px;} }
+  @media(max-width:600px){ .testi-slide{flex-basis:280px;} }
   .testi-slide-text{flex-basis:340px;}
   @media(max-width:600px){ .testi-slide-text{flex-basis:280px;} }
   .testi-header{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
@@ -546,17 +546,12 @@
   <!-- CASOS -->
   <section class="wrap" id="casos">
     <div class="section-head reveal">
-      <div class="eyebrow">Resultados reales</div>
+      <div class="eyebrow">Resultados reales <span style="color:var(--ash); text-transform:none; letter-spacing:normal; font-size:0.7rem;">— desliza →</span></div>
       <h2>Gente que ya dio el cambio</h2>
     </div>
 
-    <div id="testi-carousel-wrap" style="display:none; margin-bottom:44px;">
-      <div class="eyebrow sage" style="margin-bottom:18px;">Antes y después <span style="color:var(--ash); text-transform:none; letter-spacing:normal; font-size:0.7rem;">— desliza →</span></div>
+    <div id="testi-wrap" style="display:none;">
       <div class="testi-carousel" id="testi-carousel"></div>
-    </div>
-
-    <div id="testi-text-wrap" style="display:none;">
-      <div class="testi-carousel" id="testi-text-carousel"></div>
     </div>
 
     <p class="reveal" id="testi-empty-state" style="color:var(--ash); font-style:italic;">Todavía no hay testimonios publicados — si ya trabajaste conmigo, sé el primero en dejar el tuyo.</p>
@@ -623,47 +618,36 @@
 
         // Solo se muestran los testimonios marcados como Destacado en el Sheet
         const testimoniosDestacados = testimonios.filter(t => t.destacado);
-        const conFotos = testimoniosDestacados.filter(t => t.fotoAntes || t.fotoDespues);
-        const soloTexto = testimoniosDestacados.filter(t => !t.fotoAntes && !t.fotoDespues);
 
-        if(!conFotos.length && !soloTexto.length) return;
+        // Orden aleatorio en cada carga de página (Fisher-Yates)
+        for (let i = testimoniosDestacados.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [testimoniosDestacados[i], testimoniosDestacados[j]] = [testimoniosDestacados[j], testimoniosDestacados[i]];
+        }
+
+        if(!testimoniosDestacados.length) return;
 
         // Ya hay al menos un testimonio: quitamos el mensaje de "todavía no hay"
         const empty = document.getElementById('testi-empty-state');
         if(empty) empty.remove();
 
-        // Carrusel de antes/después
-        if(conFotos.length){
-          const carouselWrap = document.getElementById('testi-carousel-wrap');
-          const carousel = document.getElementById('testi-carousel');
-          carouselWrap.style.display = 'block';
-          conFotos.forEach(t => {
-            const slide = document.createElement('div');
-            slide.className = 'testi-slide';
-            slide.innerHTML = `
+        // Un único carrusel para todos: con foto o solo texto, mezclados en el orden en que llegan
+        const wrap = document.getElementById('testi-wrap');
+        const carousel = document.getElementById('testi-carousel');
+        wrap.style.display = 'block';
+
+        testimoniosDestacados.forEach(t => {
+          const tieneFotos = t.fotoAntes || t.fotoDespues;
+          const slide = document.createElement('div');
+          slide.className = tieneFotos ? 'testi-slide' : 'testi-slide testi-slide-text';
+          const fotosHTML = tieneFotos ? `
               <div class="testi-photos">
                 ${t.fotoAntes ? `<div class="testi-photo"><img src="${t.fotoAntes}" alt="Antes"><span>Antes</span></div>` : ''}
                 ${t.fotoDespues ? `<div class="testi-photo"><img src="${t.fotoDespues}" alt="Después"><span>Después</span></div>` : ''}
-              </div>
-              ${cabeceraHTML(t.puntuacion, t.texto)}
-              ${quoteHTML(t.texto)}
-              <div class="who">${formatearTexto(t.nombre)}</div>`;
-            carousel.appendChild(slide);
-          });
-        }
-
-        // Carrusel de testimonios de solo texto
-        if(soloTexto.length){
-          const textWrap = document.getElementById('testi-text-wrap');
-          const textCarousel = document.getElementById('testi-text-carousel');
-          textWrap.style.display = 'block';
-          soloTexto.forEach(t => {
-            const slide = document.createElement('div');
-            slide.className = 'testi-slide testi-slide-text';
-            slide.innerHTML = `${cabeceraHTML(t.puntuacion, t.texto)}${quoteHTML(t.texto)}<div class="who">${formatearTexto(t.nombre)}</div>`;
-            textCarousel.appendChild(slide);
-          });
-        }
+              </div>` : '';
+          slide.innerHTML = `${fotosHTML}${cabeceraHTML(t.puntuacion, t.texto)}${quoteHTML(t.texto)}<div class="who">${formatearTexto(t.nombre)}</div>`;
+          carousel.appendChild(slide);
+        });
 
         // Un solo listener para todos los botones "Leer más" (delegación de eventos)
         document.getElementById('casos').addEventListener('click', (e) => {
