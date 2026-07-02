@@ -353,9 +353,8 @@
       <p class="sub">Entrenas duro. Comes "bien"... o eso crees. La diferencia entre estancarte y romper la barrera no está en meterle más horas al gimnasio — está en el plan. Uno hecho para ti, no para una app.</p>
       <div class="hero-ctas">
         <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20quiero%20info%20sobre%20nutrici%C3%B3n%20y%20entrenamiento" target="_blank" rel="noopener" class="btn btn-solid">Escríbeme por WhatsApp</a>
-        <!-- TODO: sustituir "#" por tu enlace real de Calendly -->
-        <a href="https://calendly.com/aquiles-strengthcoach/1-consulta" target="_blank" rel="noopener" class="btn btn-ghost">Agenda tu cita en Calendly</a>
       </div>
+      <p style="margin:-20px 0 32px; font-size:0.82rem; color:var(--ash);">¿Prefieres agendar directo? <a href="https://calendly.com/aquiles-strengthcoach/1-consulta" target="_blank" rel="noopener" style="color:var(--sage); text-decoration:underline;">Reserva en Calendly</a></p>
       <div class="hero-meta">
         <span>Antiguo Infantería de Marina</span>
         <span>Dietista certificado</span>
@@ -478,25 +477,13 @@
       <div class="eyebrow">Resultados reales</div>
       <h2>Gente que ya dio el cambio</h2>
     </div>
-    <div class="grid-3">
-      <!-- PLACEHOLDERS: sustituye [ ] por datos reales de cada cliente (tiempo, contexto, cifra si la tienes) -->
-      <div class="testi-card reveal">
-        <p class="quote">"En [X meses] dejé de hacer dieta y aprendí a comer para entrenar. Sigo los 5 días de gym y por primera vez el plan no se rompe los findes."</p>
-        <div class="who">Carlos — [contexto: p.ej. objetivo / tiempo entrenando]</div>
-      </div>
-      <div class="testi-card reveal">
-        <p class="quote">"Vengo de intentarlo con dos apps antes. La diferencia fue tener a alguien ajustando el plan cada semana según lo que de verdad pasaba en mi día."</p>
-        <div class="who">Daniela — [contexto]</div>
-      </div>
-      <div class="testi-card reveal">
-        <p class="quote">"[Resultado concreto, ej: bajé X% de grasa / subí X kg en press banca] manteniendo mi trabajo y mis horarios reales, no los ideales."</p>
-        <div class="who">Hellen — [contexto]</div>
+    <div class="grid-3" id="testi-grid">
+      <div class="testi-card reveal" id="testi-empty-state" style="align-items:center; text-align:center; justify-content:center;">
+        <p class="quote" style="color:var(--ash); font-style:italic;">Todavía no hay testimonios publicados — si ya trabajaste conmigo, sé el primero en dejar el tuyo.</p>
+        <a href="#" id="testi-form-link" target="_blank" rel="noopener" class="btn btn-ghost" style="align-self:center; margin-top:8px;">Dejar mi testimonio</a>
       </div>
       <!-- Aquí se insertan automáticamente los testimonios aprobados desde el Google Form -->
     </div>
-    <p class="reveal" style="margin-top:28px; color:var(--ash); font-size:0.92rem;">
-      ¿Ya trabajaste conmigo? <a href="#" id="testi-form-link" target="_blank" rel="noopener" style="color:var(--sage); text-decoration:underline;">Déjame tu testimonio aquí</a> — lo reviso y lo publico con tu permiso.
-    </p>
   </section>
 
   <script>
@@ -511,7 +498,10 @@
       try{
         const res = await fetch(TESTIMONIOS_API);
         const testimonios = await res.json();
+        if(!testimonios.length) return;
         const grid = document.querySelector('#casos .grid-3');
+        const empty = document.getElementById('testi-empty-state');
+        if(empty) empty.remove();
         testimonios.forEach(t => {
           const card = document.createElement('div');
           card.className = 'testi-card reveal in';
@@ -567,7 +557,7 @@
         <span>Culturismo natural</span>
         <span>Sportland Gym</span>
       </div>
-      <p style="margin-top:16px; color:var(--ash); font-size:0.88rem; max-width:560px;">Sportland es el gimnasio donde empecé a entrenar de joven — el que me vio crecer. Hoy es donde entreno a mis clientes.</p>
+      <p style="margin-top:16px; color:var(--ash); font-size:0.88rem; max-width:560px;">Sportland es el gimnasio donde empecé a entrenar de joven — el que me vio crecer. Hoy es donde entreno a mis clientes presenciales, pero si trabajamos online el seguimiento es igual de cercano y exigente: mismas revisiones, mismos ajustes, misma disciplina.</p>
     </div>
   </section>
 
@@ -589,7 +579,7 @@
           <li>Plan de macros personalizado</li>
           <li>Revisiones periódicas</li>
         </ul>
-        <a href="#reserva" class="btn btn-ghost">Hablemos</a>
+        <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20he%20visto%20el%20Plan%20de%20Nutrici%C3%B3n%20en%20la%20web%20y%20me%20interesa%20saber%20m%C3%A1s" target="_blank" rel="noopener" class="btn btn-ghost">Me interesa</a>
       </div>
       <div class="plan-card featured reveal">
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
@@ -605,7 +595,7 @@
           <li>Programación de entreno personalizada</li>
           <li>Seguimiento semanal</li>
         </ul>
-        <a href="#reserva" class="btn btn-solid">Hablemos</a>
+        <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20quiero%20informaci%C3%B3n%20para%20empezar%20con%20el%20Plan%20Premium%20(Nutrici%C3%B3n%20%2B%20Entreno)" target="_blank" rel="noopener" class="btn btn-solid">Me interesa</a>
       </div>
       <div class="plan-card reveal">
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
@@ -620,7 +610,7 @@
           <li>Progresión por nivel de esfuerzo</li>
           <li>Ajustes por bloque</li>
         </ul>
-        <a href="#reserva" class="btn btn-ghost">Hablemos</a>
+        <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20he%20visto%20el%20Plan%20de%20Entreno%20en%20la%20web%20y%20me%20interesa%20saber%20m%C3%A1s" target="_blank" rel="noopener" class="btn btn-ghost">Me interesa</a>
       </div>
     </div>
   </section>
