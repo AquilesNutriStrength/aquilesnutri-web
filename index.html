@@ -299,6 +299,15 @@
     overflow:hidden;
   }
   .about-icon img{width:100%; height:100%; object-fit:cover;}
+  .about-stages{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+  .about-stage{position:relative;}
+  .about-stage img{width:100%; aspect-ratio:1/1; object-fit:cover; display:block; border:1px solid var(--card-border);}
+  .about-stage span{
+    position:absolute; bottom:6px; left:6px;
+    background:rgba(13,13,13,0.75); color:var(--bone);
+    font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.06em; text-transform:uppercase;
+    padding:3px 7px;
+  }
   .about h2{margin-top:0;}
   .about-tags{
     display:flex; flex-wrap:wrap; gap:10px; margin-top:26px;
@@ -603,15 +612,20 @@
 
   <!-- SOBRE AQUILES -->
   <section class="wrap about">
-    <div class="about-icon reveal" aria-hidden="true">
-      <!-- TODO: sustituye este SVG por tu foto real:
-           <img src="tu-foto.jpg" alt="Aquiles"> -->
-      <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-        <circle cx="36" cy="36" r="34" stroke="#8CAA5C" stroke-width="1"/>
-        <circle cx="36" cy="36" r="24" stroke="#F6A000" stroke-width="1"/>
-        <circle cx="36" cy="36" r="14" stroke="#8CAA5C" stroke-width="1"/>
-        <circle cx="36" cy="36" r="4" fill="#F6A000"/>
-      </svg>
+    <div class="about-icon reveal">
+      <img src="assets/aquiles-foto.jpg" alt="Aquiles, entrenador y dietista">
+    </div>
+    <div class="about-stages reveal">
+      <div class="about-stage">
+        <img src="assets/etapa-rugby.jpg" alt="Aquiles jugando al rugby">
+        <span>Rugby</span>
+      </div>
+      <!-- TODO: cuando tengas la foto militar, añade aquí:
+      <div class="about-stage">
+        <img src="assets/etapa-militar.jpg" alt="Aquiles en la Infantería de Marina">
+        <span>Infantería</span>
+      </div>
+      -->
     </div>
     <div class="reveal">
       <div class="eyebrow sage">Quién te acompaña</div>
