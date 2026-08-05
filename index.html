@@ -289,6 +289,17 @@
   @media(max-width:600px){ .testi-slide{flex-basis:280px;} }
   .testi-slide-text{flex-basis:340px;}
   @media(max-width:600px){ .testi-slide-text{flex-basis:280px;} }
+
+  /* Tarjetas CON foto: más grandes, la imagen manda, el texto se reduce */
+  .testi-slide-photo{flex-basis:460px; padding:24px 24px 28px;}
+  .testi-slide-photo .testi-photo img{aspect-ratio:3/4;}
+  .testi-slide-photo p.quote{font-size:0.8rem; margin-bottom:10px;}
+  .testi-slide-photo .testi-header{margin-bottom:10px;}
+  .testi-slide-photo .testi-highlight{font-size:0.82rem;}
+  .testi-slide-photo .testi-stars{font-size:0.82rem;}
+  .testi-slide-photo .who{font-size:0.62rem;}
+  .testi-slide-photo .leer-mas{font-size:0.62rem;}
+  @media(max-width:600px){ .testi-slide-photo{flex-basis:340px;} }
   .testi-header{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
   .testi-stars{color:var(--ember); letter-spacing:2px; font-size:0.95rem;}
   .testi-highlight{
@@ -449,6 +460,62 @@
   </section>
 
   <div class="meander"></div>
+
+  <!-- SOBRE AQUILES -->
+  <section class="wrap about">
+    <div class="about-icon reveal" id="about-carousel">
+      <div class="slide active">
+        <img src="assets/aquiles-foto.jpg" alt="Aquiles, entrenador y dietista">
+        <span>Hoy</span>
+      </div>
+      <div class="slide">
+        <img src="assets/etapa-rugby.jpg" alt="Aquiles jugando al rugby">
+        <span>Rugby</span>
+      </div>
+      <!-- TODO: cuando tengas la foto militar, añade aquí una diapositiva más:
+      <div class="slide">
+        <img src="assets/etapa-militar.jpg" alt="Aquiles en la Infantería de Marina">
+        <span>Infantería</span>
+      </div>
+      -->
+    </div>
+    <div class="reveal about-body">
+      <div class="eyebrow sage">Quién te acompaña</div>
+      <h2>Aquiles</h2>
+      <dl class="about-faq">
+        <div>
+          <dt>¿Cómo llegué hasta aquí?</dt>
+          <dd>Empecé a entrenar a los 15 por el rugby — quería un físico que aguantara el deporte. Ocho años jugando me llevaron hasta la selección española militar, camino al mundial, hasta que una lesión lo paró todo. Ahí descubrí el culturismo, y un año después ya estaba compitiendo en categoría natural.</dd>
+        </div>
+        <div>
+          <dt>¿Por qué me metí en nutrición?</dt>
+          <dd>A mi madre le llegó la menopausia y no entendía lo que le pasaba a su cuerpo. Yo tampoco entendía del todo lo que pasaba con el mío entrenando. Empecé a estudiar por las dos cosas — para mí y para poder ayudar a los demás — y en cuanto vi que comer mejor cambiaba mis resultados, no hubo vuelta atrás.</dd>
+        </div>
+        <div>
+          <dt>¿Qué me dejó la Infantería de Marina?</dt>
+          <dd>5 años. Lo que más me llevo: el camino correcto casi siempre es el que más te incomoda. Nada crece en la zona de confort — esa es la disciplina que uso hoy contigo y conmigo mismo.</dd>
+        </div>
+        <div>
+          <dt>¿Por qué nutrición y no solo entreno?</dt>
+          <dd>Porque un buen entreno con mala nutrición todavía da resultados — pero se queda corto. Lo óptimo es meter las dos cosas a la vez: el entreno pone el estímulo, la nutrición se asegura de que ese estímulo se convierta en resultado y no se pierda por el camino.</dd>
+        </div>
+        <div>
+          <dt>¿Soy perfecto?</dt>
+          <dd>No. Tengo altibajos como cualquiera, épocas mejores y peores. Lo que hago es apuntar a ese 20% de cosas que dan el 80% de los resultados — no a hacerlo todo perfecto, todo el tiempo. Eso es lo que te voy a pedir a ti también.</dd>
+        </div>
+      </dl>
+      <p style="margin-top:22px; color:var(--ember); font-family:'Fraunces',serif; font-size:1.05rem;">"Build Your Own Hero" no es un eslogan, es el método.</p>
+      <div class="about-tags">
+        <span>Infantería de Marina</span>
+        <span>Dietista certificado</span>
+        <span>Culturismo natural</span>
+        <span>Sportland Gym</span>
+      </div>
+      <p style="margin-top:16px; color:var(--ash); font-size:0.88rem; max-width:560px;">Sportland es el gimnasio donde empecé a entrenar de joven — el que me vio crecer. Hoy es donde entreno a mis clientes presenciales, pero si trabajamos online el seguimiento es igual de cercano y exigente: mismas revisiones, mismos ajustes, misma disciplina.</p>
+      <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20he%20le%C3%ADdo%20tu%20historia%20y%20quiero%20trabajar%20contigo" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:28px;">Quiero trabajar contigo</a>
+    </div>
+  </section>
+
 
   <!-- PARA QUIÉN -->
   <section class="wrap">
@@ -639,7 +706,7 @@
         testimoniosDestacados.forEach(t => {
           const tieneFotos = t.fotoAntes || t.fotoDespues;
           const slide = document.createElement('div');
-          slide.className = tieneFotos ? 'testi-slide' : 'testi-slide testi-slide-text';
+          slide.className = tieneFotos ? 'testi-slide testi-slide-photo' : 'testi-slide testi-slide-text';
           const fotosHTML = tieneFotos ? `
               <div class="testi-photos">
                 ${t.fotoAntes ? `<div class="testi-photo"><img src="${t.fotoAntes}" alt="Antes"><span>Antes</span></div>` : ''}
@@ -660,60 +727,6 @@
     }
     cargarTestimonios();
   </script>
-
-  <!-- SOBRE AQUILES -->
-  <section class="wrap about">
-    <div class="about-icon reveal" id="about-carousel">
-      <div class="slide active">
-        <img src="assets/aquiles-foto.jpg" alt="Aquiles, entrenador y dietista">
-        <span>Hoy</span>
-      </div>
-      <div class="slide">
-        <img src="assets/etapa-rugby.jpg" alt="Aquiles jugando al rugby">
-        <span>Rugby</span>
-      </div>
-      <!-- TODO: cuando tengas la foto militar, añade aquí una diapositiva más:
-      <div class="slide">
-        <img src="assets/etapa-militar.jpg" alt="Aquiles en la Infantería de Marina">
-        <span>Infantería</span>
-      </div>
-      -->
-    </div>
-    <div class="reveal about-body">
-      <div class="eyebrow sage">Quién te acompaña</div>
-      <h2>Aquiles</h2>
-      <dl class="about-faq">
-        <div>
-          <dt>¿Cómo llegué hasta aquí?</dt>
-          <dd>Empecé a entrenar a los 15 por el rugby — quería un físico que aguantara el deporte. Ocho años jugando me llevaron hasta la selección española militar, camino al mundial, hasta que una lesión lo paró todo. Ahí descubrí el culturismo, y un año después ya estaba compitiendo en categoría natural.</dd>
-        </div>
-        <div>
-          <dt>¿Por qué me metí en nutrición?</dt>
-          <dd>A mi madre le llegó la menopausia y no entendía lo que le pasaba a su cuerpo. Yo tampoco entendía del todo lo que pasaba con el mío entrenando. Empecé a estudiar por las dos cosas — para mí y para poder ayudar a los demás — y en cuanto vi que comer mejor cambiaba mis resultados, no hubo vuelta atrás.</dd>
-        </div>
-        <div>
-          <dt>¿Qué me dejó la Infantería de Marina?</dt>
-          <dd>5 años. Lo que más me llevo: el camino correcto casi siempre es el que más te incomoda. Nada crece en la zona de confort — esa es la disciplina que uso hoy contigo y conmigo mismo.</dd>
-        </div>
-        <div>
-          <dt>¿Por qué nutrición y no solo entreno?</dt>
-          <dd>Porque un buen entreno con mala nutrición todavía da resultados — pero se queda corto. Lo óptimo es meter las dos cosas a la vez: el entreno pone el estímulo, la nutrición se asegura de que ese estímulo se convierta en resultado y no se pierda por el camino.</dd>
-        </div>
-        <div>
-          <dt>¿Soy perfecto?</dt>
-          <dd>No. Tengo altibajos como cualquiera, épocas mejores y peores. Lo que hago es apuntar a ese 20% de cosas que dan el 80% de los resultados — no a hacerlo todo perfecto, todo el tiempo. Eso es lo que te voy a pedir a ti también.</dd>
-        </div>
-      </dl>
-      <p style="margin-top:22px; color:var(--ember); font-family:'Fraunces',serif; font-size:1.05rem;">"Build Your Own Hero" no es un eslogan, es el método.</p>
-      <div class="about-tags">
-        <span>Infantería de Marina</span>
-        <span>Dietista certificado</span>
-        <span>Culturismo natural</span>
-        <span>Sportland Gym</span>
-      </div>
-      <p style="margin-top:16px; color:var(--ash); font-size:0.88rem; max-width:560px;">Sportland es el gimnasio donde empecé a entrenar de joven — el que me vio crecer. Hoy es donde entreno a mis clientes presenciales, pero si trabajamos online el seguimiento es igual de cercano y exigente: mismas revisiones, mismos ajustes, misma disciplina.</p>
-    </div>
-  </section>
 
   <!-- PLANES -->
   <section class="wrap" id="planes">
@@ -775,7 +788,7 @@
       <div class="eyebrow" style="justify-content:center;">Empieza hoy</div>
       <h2>Tu cambio empieza con un <span class="word">mensaje</span>.</h2>
       <div class="final-cta-ctas">
-        <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20quiero%20info%20sobre%20nutrici%C3%B3n%20y%20entrenamiento" target="_blank" rel="noopener" class="btn btn-solid">Escríbeme por WhatsApp</a>
+        <a href="https://wa.me/34614149233?text=Hola%20Aquiles%2C%20quiero%20info%20sobre%20nutrici%C3%B3n%20y%20entrenamiento" target="_blank" rel="noopener" class="btn btn-solid">Reserva tu consulta</a>
         <a href="https://calendly.com/aquiles-strengthcoach/1-consulta" target="_blank" rel="noopener" class="btn btn-ghost">Agenda tu cita en Calendly</a>
       </div>
       <div class="handle">614 14 92 33 · presencial y online</div>
