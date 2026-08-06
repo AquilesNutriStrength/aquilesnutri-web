@@ -26,7 +26,18 @@
   h1{font-family:'Fraunces',serif; font-size:2rem; margin-bottom:12px; line-height:1.15;}
   p.sub{color:var(--ash); margin-bottom:32px; font-size:0.98rem;}
   label{display:block; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--sage); margin-bottom:8px;}
-  .field{margin-bottom:22px;}
+  form{
+    display:block;
+    width:100%;
+  }
+  form > .field{
+    display:block;
+    width:100%;
+    margin-bottom:22px;
+  }
+  .field{
+    margin-bottom:22px;
+  }
   input[type="text"], textarea{
     width:100%; background:var(--card); border:1px solid var(--card-border);
     color:var(--bone); padding:13px 14px; font-family:'Inter',sans-serif; font-size:0.98rem;
@@ -65,6 +76,10 @@
   .msg.err{background:rgba(198,91,78,0.15); border:1px solid #C65B4E; color:#C65B4E; display:block;}
   a.back{display:inline-block; margin-top:28px; color:var(--ash); font-size:0.85rem; text-decoration:none;}
   a.back:hover{color:var(--ember);}
+  @media (max-width:600px){
+    body{padding:24px 18px;}
+    .box{max-width:520px;}
+  }
 </style>
 </head>
 <body>
@@ -136,7 +151,7 @@
   <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script>
     // TODO: pega aquí la misma URL /exec de tu Apps Script Web App
-    const TESTIMONIOS_API = "https://script.google.com/macros/s/AKfycbzbWfehVl6Epos8-tMUT9YOM1gPXSKFmJKf6OUxlBzHb9PLbhIojbT9Xt-xGGaaUb8X/exec";
+    const TESTIMONIOS_API = "https://script.google.com/macros/s/AKfycbwdrE2kcojh6zyioxcC5lpgiU-GdejNaJjjvNDl0JGGkNvW7F541GXBqj73Rx3G_-VK/exec";
 
     const form = document.getElementById('testiForm');
     const btn = document.getElementById('submitBtn');
