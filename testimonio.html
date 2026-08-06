@@ -85,24 +85,15 @@
         <div style="flex:1;">
           <label for="edad">Edad <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
           <input type="text" id="edad" name="edad" inputmode="numeric" placeholder="Ej: 34">
-          <div class="field">
-  <label for="hijos">
-    ¿Tienes hijos?
-    ¿Cuántos?
-    <span style="text-transform:none; color:var(--card-border);">(opcional)</span>
-  </label>
-
-  <input
-    type="text"
-    id="hijos"
-    name="hijos"
-    inputmode="numeric"
-    placeholder="Ej: 2">
         </div>
-        <div style="flex:2;">
-          <label for="profesion">A qué te dedicas <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
-          <input type="text" id="profesion" name="profesion" placeholder="Ej: comercial, opositor, madre de 2...">
+        <div style="flex:1;">
+          <label for="hijos">¿Tienes hijos? ¿Cuántos? <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
+          <input type="text" id="hijos" name="hijos" inputmode="numeric" placeholder="Ej: 2">
         </div>
+      </div>
+      <div class="field">
+        <label for="profesion">A qué te dedicas <span style="text-transform:none; color:var(--card-border);">(opcional)</span></label>
+        <input type="text" id="profesion" name="profesion" placeholder="Ej: comercial, opositor, enfermera...">
       </div>
       <div class="field">
         <label for="situacion">¿Cuál era tu situación antes de empezar?</label>
@@ -316,6 +307,7 @@
             nombre: document.getElementById('nombre').value,
             edad: document.getElementById('edad').value,
             profesion: document.getElementById('profesion').value,
+            hijos: document.getElementById('hijos').value,
             situacion: document.getElementById('situacion').value,
             testimonio: document.getElementById('testimonio').value,
             puntuacion: document.getElementById('puntuacion').value,
