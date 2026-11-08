@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu guía gratuita — Aquiles Nutri Strength</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#222420; --card:#33352E; --card-border:#454740;
+    --ash:#A9A79C; --bone:#F1EEE6; --ember:#F6A000; --sage:#8CAA5C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--void); color:var(--bone);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:32px;
+  }
+  .box{max-width:520px; width:100%;}
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:36px;}
+  .brand img{width:32px; height:32px; object-fit:contain;}
+  .brand span{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; color:var(--ash);}
+  .tag{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--void); background:var(--sage); padding:4px 10px; border-radius:2px; margin-bottom:16px;}
+  h1{font-family:'Fraunces',serif; font-size:2rem; margin-bottom:12px; line-height:1.15;}
+  h1 em{color:var(--ember); font-style:italic;}
+  p.sub{color:var(--ash); margin-bottom:32px; font-size:0.98rem; line-height:1.5;}
+  label{display:block; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--sage); margin-bottom:8px;}
+  .field{margin-bottom:22px;}
+  input[type="text"], input[type="email"], select{
+    width:100%; background:var(--card); border:1px solid var(--card-border);
+    color:var(--bone); padding:13px 14px; font-family:'Inter',sans-serif; font-size:0.98rem;
+    border-radius:2px; appearance:none;
+  }
+  select{background-image:linear-gradient(45deg,transparent 50%,var(--ash) 50%),linear-gradient(135deg,var(--ash) 50%,transparent 50%); background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%; background-size:5px 5px; background-repeat:no-repeat;}
+  input:focus, select:focus{outline:2px solid var(--ember); outline-offset:1px;}
+  .check{display:flex; align-items:flex-start; gap:10px;}
+  .check input{margin-top:3px; accent-color:var(--ember);}
+  .check label{text-transform:none; font-family:'Inter',sans-serif; color:var(--ash); letter-spacing:normal; margin:0; font-size:0.85rem; line-height:1.45;}
+  .btn{
+    display:block; width:100%; margin-top:8px; padding:15px; text-align:center; text-decoration:none;
+    background:var(--ember); color:var(--void);
+    border:none; font-family:'IBM Plex Mono',monospace; font-weight:600;
+    font-size:0.82rem; letter-spacing:0.06em; text-transform:uppercase;
+    cursor:pointer; border-radius:2px;
+  }
+  .btn:hover{background:#FF9B00;}
+  .btn:disabled{opacity:0.6; cursor:not-allowed;}
+  .btn.ghost{background:transparent; color:var(--bone); border:1px solid var(--card-border);}
+  .btn.ghost:hover{border-color:var(--ember); color:var(--ember);}
+  .msg{margin-top:20px; font-size:0.92rem; padding:14px; border-radius:2px; display:none;}
+  .msg.err{background:rgba(198,91,78,0.15); border:1px solid #C65B4E; color:#C65B4E; display:block;}
+  .note{margin-top:14px; font-size:0.78rem; color:var(--card-border); text-align:center;}
+  #exito{display:none;}
+  .card{background:var(--card); border:1px solid var(--card-border); padding:22px; border-radius:2px; margin:28px 0 12px;}
+  .card h2{font-family:'Fraunces',serif; font-size:1.3rem; margin-bottom:8px;}
+  .card p{color:var(--ash); font-size:0.92rem; line-height:1.5; margin-bottom:16px;}
+  .row{display:flex; gap:10px;}
+  .row .btn{margin-top:0;}
+  a.back{display:inline-block; margin-top:28px; color:var(--ash); font-size:0.85rem; text-decoration:none;}
+  a.back:hover{color:var(--ember);}
+  @media (max-width:600px){
+    body{padding:24px 18px;}
+    .row{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="brand">
+      <img src="assets/logo-white.png" alt="Aquiles Nutri Strength">
+      <span>AQUILES NUTRI STRENGTH</span>
+    </div>
+
+    <!-- PASO 1: FORMULARIO -->
+    <div id="paso1">
+      <span class="tag">Guía gratuita</span>
+      <h1 id="titulo">Tu guía nutricional, <em>lista para descargar</em></h1>
+      <p class="sub" id="subtitulo">Déjame tu nombre y tu email y la descargas al momento. También te la mando al correo para que no la pierdas.</p>
+
+      <form id="guiaForm" novalidate>
+        <div class="field">
+          <label for="nombre">Tu nombre</label>
+          <input type="text" id="nombre" name="nombre" required autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label for="email">Tu email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" inputmode="email" placeholder="tu@email.com">
+        </div>
+        <div class="field">
+          <label for="objetivo">¿Cuál es tu objetivo principal?</label>
+          <select id="objetivo" name="objetivo" required>
+            <option value="" disabled selected>Elige uno</option>
+            <option>Perder grasa</option>
+            <option>Ganar músculo</option>
+            <option>Comer mejor y tener más energía</option>
+            <option>Rendir más en mi deporte</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field check">
+          <input type="checkbox" id="rgpd" name="rgpd" required>
+          <label for="rgpd">Acepto que Aquiles Nutri Strength guarde mis datos para enviarme esta guía y contenido sobre nutrición y entrenamiento. Puedo darme de baja cuando quiera respondiendo a cualquier email.</label>
+        </div>
+        <button type="submit" class="btn" id="submitBtn">Quiero mi guía</button>
+        <div class="msg" id="msgBox"></div>
+        <p class="note">Sin spam. Solo cosas que te sirvan.</p>
+      </form>
+    </div>
+
+    <!-- PASO 2: DESCARGA + CTA -->
+    <div id="exito">
+      <span class="tag">Listo</span>
+      <h1>¡Aquí la tienes, <em id="nombreOk">crack</em>! 💪</h1>
+      <p class="sub">Descárgala ahora. Te la he enviado también a tu email (si no la ves, mira en Promociones o Spam).</p>
+
+      <a class="btn" id="btnDescargar" href="#" target="_blank" rel="noopener" download>⬇ Descargar la guía</a>
+
+      <div class="card">
+        <h2>¿Quieres un plan hecho solo para ti?</h2>
+        <p>La guía es el punto de partida. Si quieres que adapte la nutrición y el entrenamiento a tu vida real, horarios y familia incluidos, hablamos.</p>
+        <div class="row">
+          <a class="btn" id="btnWhatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn ghost" href="https://calendly.com/aquiles-strengthcoach/1-consulta" target="_blank" rel="noopener">Reservar llamada</a>
+        </div>
+      </div>
+    </div>
+
+    <a class="back" href="index.html">← Ver la web completa</a>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIGURACIÓN — solo tienes que tocar esto
+    // ============================================================
+
+    // 1) URL /exec del Apps Script de LEADS (el nuevo, no el de testimonios)
+    const LEADS_API = "https://script.google.com/macros/s/AKfycbyJM5epqsFH7r1lpsFkWjNLWHga8Vs0AjERhdwpsxlfRR6nz6gQLDOroMFmu7XJ2ZganA/exec";
+
+    // 2) Tus guías. La clave es lo que va en el enlace: guia.html?g=CLAVE
+    //    archivo = ruta del PDF dentro del repositorio (carpeta assets/guias/)
+    const GUIAS = {
+      proteina: {
+        titulo: 'No es solo proteína. <em>Es aprender a comer.</em>',
+        subtitulo: 'Calcula tus macros, entiende qué te aporta cada alimento y llévalo al plato sin depender de la báscula. Déjame tu nombre y tu email y la descargas al momento (también te la mando al correo).',
+        nombre: 'Guía de proteínas y macros',
+        archivo: 'assets/guias/guia-proteinas-macros.pdf'
+      }
+      // Para un reel futuro: sube el PDF a assets/guias/ y añade otra entrada (quita las //):
+      // otra: {
+      //   titulo: 'Título <em>de la guía</em>',
+      //   subtitulo: 'Texto corto debajo del título.',
+      //   nombre: 'Nombre de la guía',
+      //   archivo: 'assets/guias/nombre-del-pdf.pdf'
+      // }
+    };
+    const GUIA_POR_DEFECTO = 'proteina';
+    const WHATSAPP = '34614149233';
+    // ============================================================
+
+    const params = new URLSearchParams(location.search);
+    const clave = GUIAS[params.get('g')] ? params.get('g') : GUIA_POR_DEFECTO;
+    const guia = GUIAS[clave];
+    const origen = params.get('src') || 'instagram';
+
+    document.getElementById('titulo').innerHTML = guia.titulo;
+    if (guia.subtitulo) document.getElementById('subtitulo').textContent = guia.subtitulo;
+
+    // Enlace absoluto al PDF (sirve para el botón y para el email)
+    const enlaceVer = new URL(guia.archivo, location.href).href;
+    const enlaceDescarga = enlaceVer;
+
+    const form = document.getElementById('guiaForm');
+    const btn = document.getElementById('submitBtn');
+    const msg = document.getElementById('msgBox');
+
+    function mostrarError(texto){
+      msg.className = 'msg err';
+      msg.textContent = texto;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.className = 'msg';
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const objetivo = document.getElementById('objetivo').value;
+      const rgpd = document.getElementById('rgpd').checked;
+
+      if(!nombre) return mostrarError('Dime tu nombre 🙂');
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return mostrarError('Ese email no parece correcto. ¿Lo revisas?');
+      if(!objetivo) return mostrarError('Elige tu objetivo principal.');
+      if(!rgpd) return mostrarError('Necesito que aceptes la casilla de privacidad para enviarte la guía.');
+
+      btn.disabled = true;
+      btn.textContent = 'Preparando tu guía...';
+
+      try{
+        if(!LEADS_API.startsWith('PEGA_AQUI')){
+          await fetch(LEADS_API, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {'Content-Type': 'text/plain;charset=utf-8'},
+            body: JSON.stringify({
+              nombre, email, objetivo, rgpd,
+              guia: guia.nombre,
+              enlace: enlaceVer,
+              origen
+            })
+          });
+        }
+      }catch(err){
+        // Si falla el guardado, igualmente le damos la guía: mejor no perder la confianza
+        console.log('No se pudo guardar el lead:', err);
+      }
+
+      // Mostrar paso 2
+      document.getElementById('nombreOk').textContent = nombre.split(' ')[0];
+      document.getElementById('btnDescargar').href = enlaceDescarga;
+      const textoWa = `Hola Aquiles, soy ${nombre}. Me he descargado la ${guia.nombre.toLowerCase()} y me interesa un plan personalizado. Mi objetivo es: ${objetivo.toLowerCase()}.`;
+      document.getElementById('btnWhatsapp').href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(textoWa)}`;
+      document.getElementById('paso1').style.display = 'none';
+      document.getElementById('exito').style.display = 'block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  </script>
+</body>
+</html>
